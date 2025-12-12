@@ -29,7 +29,7 @@ export default function ProductPage() {
     async function loadProduct() {
       try {
         const res = await api.get(`/products/${productSlug}`);
-        setProduct(res.data.data);
+        setProduct(res.data);
       } catch (error) {
         console.error('Erro ao carregar produto:', error);
       } finally {

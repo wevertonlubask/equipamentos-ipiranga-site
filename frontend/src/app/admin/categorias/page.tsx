@@ -16,7 +16,8 @@ export default function AdminCategoriesPage() {
   const loadCategories = async () => {
     try {
       const res = await api.get('/categories');
-      setCategories(res.data.data || []);
+      // res já é o JSON: { success: true, data: [...] }
+      setCategories(res.data || []);
     } catch (error) {
       console.error('Erro ao carregar categorias:', error);
     } finally {
@@ -60,7 +61,8 @@ export default function AdminCategoriesPage() {
       setShowModal(false);
       loadCategories();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao salvar categoria');
+      console.error('Erro ao salvar categoria:', error);
+      alert(error.message || 'Erro ao salvar categoria');
     }
   };
 
@@ -70,7 +72,8 @@ export default function AdminCategoriesPage() {
       await api.delete(`/categories/${id}`);
       loadCategories();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao excluir categoria');
+      console.error('Erro ao excluir categoria:', error);
+      alert(error.message || 'Erro ao excluir categoria');
     }
   };
 

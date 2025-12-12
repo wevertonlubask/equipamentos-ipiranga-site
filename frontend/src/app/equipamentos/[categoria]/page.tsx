@@ -26,8 +26,8 @@ export default function CategoryPage() {
           api.get(`/categories/${categorySlug}`),
           api.get(`/products?category=${categorySlug}&active=true&limit=100`)
         ]);
-        setCategory(catRes.data.data);
-        setProducts(prodRes.data.data?.products || []);
+        setCategory(catRes.data);
+        setProducts(prodRes.data?.products || []);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {

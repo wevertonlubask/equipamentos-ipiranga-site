@@ -38,7 +38,7 @@ class ApiClient {
 
   getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return this.token || localStorage.getItem('token');
+      return this.token || localStorage.getItem('admin_token') || localStorage.getItem('token');
     }
     return this.token;
   }

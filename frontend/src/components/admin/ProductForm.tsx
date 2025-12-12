@@ -36,7 +36,7 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
   const [newSpec, setNewSpec] = useState({ key: '', value: '' });
 
   useEffect(() => {
-    api.get('/categories').then(res => setCategories(res.data.data || [])).catch(() => {});
+    api.get('/categories').then(res => setCategories(res.data || [])).catch(() => {});
   }, []);
 
   const generateSlug = (name: string) => {
@@ -87,9 +87,9 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         if (isPrimary) {
-          setFeaturedImage(res.data.data.image_url);
+          setFeaturedImage(res.data.image_url);
         }
-        setImages(res.data.data.images || []);
+        setImages(res.data.images || []);
       } else {
         // For new products, just preview the image
         const reader = new FileReader();

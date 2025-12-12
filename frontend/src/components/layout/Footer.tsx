@@ -19,7 +19,7 @@ export default function Footer() {
   const [settings, setSettings] = useState<Settings>({});
 
   useEffect(() => {
-    api.get('/settings/public').then(res => setSettings(res.data.data || {})).catch(() => {});
+    api.get('/settings/public').then(res => setSettings(res.data || {})).catch(() => {});
   }, []);
 
   const year = new Date().getFullYear();

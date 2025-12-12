@@ -13,7 +13,7 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     api.get('/settings').then(res => {
       const data: Record<string, string> = {};
-      (res.data.data || []).forEach((s: any) => { data[s.setting_key] = s.setting_value || ''; });
+      (res.data || []).forEach((s: any) => { data[s.setting_key] = s.setting_value || ''; });
       setSettings(data);
     }).catch(console.error).finally(() => setLoading(false));
   }, []);

@@ -19,12 +19,16 @@ const UPLOAD_DIRS = {
   temp: path.join(__dirname, '../../uploads/temp')
 };
 
-// Criar diretórios se não existirem
-Object.values(UPLOAD_DIRS).forEach(async (dir) => {
+// Criar diretórios sincronamente na inicialização
+const fsSync = require('fs');
+Object.values(UPLOAD_DIRS).forEach((dir) => {
   try {
-    await fs.mkdir(dir, { recursive: true });
+    if (!fsSync.existsSync(dir)) {
+      fsSync.mkdirSync(dir, { recursive: true });
+      console.log(`📁 Pasta criada: ${dir}`);
+    }
   } catch (error) {
-    // Ignora se já existe
+    console.error(`Erro ao criar pasta ${dir}:`, error);
   }
 });
 
@@ -121,10 +125,16 @@ const processImage = async (inputPath, outputDir, options = {}) => {
     // Ignora erro se arquivo já foi removido
   }
 
+  // Extrair o tipo de pasta (products, banners, logo) do caminho
+  const uploadsIndex = outputDir.indexOf('uploads');
+  const relativePath = uploadsIndex !== -1 
+    ? outputDir.substring(uploadsIndex + 'uploads'.length)
+    : '';
+  
   return {
     filename,
     path: outputPath,
-    url: `/${outputDir.split('uploads/')[1]}/${filename}`,
+    url: `${relativePath}/${filename}`,
     width: metadata.width,
     height: metadata.height,
     format: metadata.format,

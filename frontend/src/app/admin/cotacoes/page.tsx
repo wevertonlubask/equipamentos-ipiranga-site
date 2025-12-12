@@ -50,8 +50,8 @@ export default function AdminQuotationsPage() {
       if (search) params.append('search', search);
 
       const res = await api.get(`/quotations?${params.toString()}`);
-      setQuotations(res.data.data?.quotations || []);
-      setPagination(res.data.data?.pagination);
+      setQuotations(res.data?.quotations || []);
+      setPagination(res.data?.pagination);
     } catch (error) {
       console.error('Erro ao carregar cotações:', error);
     } finally {
@@ -100,7 +100,7 @@ export default function AdminQuotationsPage() {
   const viewQuotation = async (id: number) => {
     try {
       const res = await api.get(`/quotations/${id}`);
-      setSelectedQuotation(res.data.data);
+      setSelectedQuotation(res.data);
     } catch (error) {
       console.error('Erro ao carregar cotação:', error);
     }

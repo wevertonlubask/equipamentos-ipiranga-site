@@ -26,8 +26,8 @@ export default function EquipamentosPage() {
           api.get('/categories?active=true'),
           api.get('/products?active=true&limit=100')
         ]);
-        setCategories(catRes.data.data || []);
-        setProducts(prodRes.data.data?.products || []);
+        setCategories(catRes.data || []);
+        setProducts(prodRes.data?.products || []);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {

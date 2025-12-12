@@ -94,6 +94,11 @@ class BannerController {
   static async create(req, res) {
     try {
       const data = { ...req.body };
+      
+      // Converter is_active de string para boolean
+      if (typeof data.is_active === 'string') {
+        data.is_active = data.is_active === 'true';
+      }
 
       // Usar imagens processadas do middleware
       if (req.processedImages?.desktop) {
@@ -135,6 +140,11 @@ class BannerController {
     try {
       const { id } = req.params;
       const data = { ...req.body };
+      
+      // Converter is_active de string para boolean
+      if (typeof data.is_active === 'string') {
+        data.is_active = data.is_active === 'true';
+      }
 
       const banner = await Banner.findById(id);
       if (!banner) {

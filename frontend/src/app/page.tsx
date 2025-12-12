@@ -25,9 +25,9 @@ export default function HomePage() {
           api.get('/products/featured?limit=8'),
           api.get('/categories?active=true')
         ]);
-        setBanners(bannersRes.data.data || []);
-        setFeaturedProducts(productsRes.data.data || []);
-        setCategories(categoriesRes.data.data || []);
+        setBanners(bannersRes.data || []);
+        setFeaturedProducts(productsRes.data || []);
+        setCategories(categoriesRes.data || []);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {

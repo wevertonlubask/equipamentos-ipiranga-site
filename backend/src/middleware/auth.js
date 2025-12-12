@@ -8,6 +8,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Secret padrão para desenvolvimento (NÃO USAR EM PRODUÇÃO!)
+const JWT_SECRET = process.env.JWT_SECRET || 'ipiranga-fitness-dev-secret-key-2024';
+
 /**
  * Verifica se o token JWT é válido
  */
@@ -26,7 +29,7 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
 
     // Verificar token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Buscar usuário
     const user = await User.findById(decoded.userId);
@@ -114,7 +117,7 @@ const canEdit = authorize(['admin', 'editor']);
 const generateToken = (user) => {
   return jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
+    JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 };
@@ -128,7 +131,7 @@ const optionalAuth = async (req, res, next) => {
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET);
       const user = await User.findById(decoded.userId);
       
       if (user && user.is_active) {

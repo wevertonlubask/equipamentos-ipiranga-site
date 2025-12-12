@@ -30,13 +30,13 @@ export default function AdminDashboardPage() {
         ]);
 
         setStats({
-          products: productsRes.data.data?.pagination?.total || 0,
-          categories: categoriesRes.data.data?.length || 0,
-          banners: bannersRes.data.data?.length || 0,
-          quotations: quotationsRes.data.data || {}
+          products: productsRes.data?.pagination?.total || 0,
+          categories: categoriesRes.data?.length || 0,
+          banners: bannersRes.data?.length || 0,
+          quotations: quotationsRes.data || {}
         });
 
-        setRecentQuotations(recentRes.data.data?.quotations || []);
+        setRecentQuotations(recentRes.data?.quotations || []);
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error);
       } finally {

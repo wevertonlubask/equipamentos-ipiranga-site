@@ -26,8 +26,8 @@ export default function AdminProductsPage() {
       if (categoryFilter) params.append('category', categoryFilter);
 
       const res = await api.get(`/products?${params.toString()}`);
-      setProducts(res.data.data?.products || []);
-      setPagination(res.data.data?.pagination);
+      setProducts(res.data?.products || []);
+      setPagination(res.data?.pagination);
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
     } finally {
@@ -36,7 +36,7 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    api.get('/categories').then(res => setCategories(res.data.data || [])).catch(() => {});
+    api.get('/categories').then(res => setCategories(res.data || [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -55,7 +55,8 @@ export default function AdminProductsPage() {
       await api.delete(`/products/${id}`);
       loadProducts();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao excluir produto');
+      console.error('Erro ao excluir:', error);
+      alert(error.message || 'Erro ao excluir produto');
     }
   };
 

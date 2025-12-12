@@ -15,7 +15,7 @@ export default function EditProductPage() {
     async function loadProduct() {
       try {
         const res = await api.get(`/products/${params.id}`);
-        setProduct(res.data.data);
+        setProduct(res.data);
       } catch (error) {
         console.error('Erro ao carregar produto:', error);
       } finally {

@@ -1,0 +1,9 @@
+{
+  "/not-found": "app/not-found.js",
+  "/page": "app/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/admin/configuracoes/page": "app/admin/configuracoes/page.js",
+  "/admin/categorias/page": "app/admin/categorias/page.js",
+  "/admin/produtos/novo/page": "app/admin/produtos/novo/page.js",
+  "/admin/produtos/page": "app/admin/produtos/page.js"
+}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { api } from '@/lib/api';
 import { Product, Category } from '@/types';
+import { getUploadUrl } from '@/utils';
 
 interface ProductFormProps {
   product?: Product;
@@ -251,7 +252,7 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
             <div className="space-y-4">
               {featuredImage ? (
                 <div className="relative aspect-square rounded-lg overflow-hidden bg-neutral-800">
-                  <Image src={featuredImage} alt="Preview" fill className="object-cover" />
+                  <Image src={featuredImage.startsWith('data:') ? featuredImage : getUploadUrl(featuredImage)} alt="Preview" fill className="object-cover" />
                 </div>
               ) : (
                 <div className="aspect-square rounded-lg bg-neutral-800 flex items-center justify-center">

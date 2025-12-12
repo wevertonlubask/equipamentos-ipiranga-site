@@ -12,6 +12,7 @@ import CartDrawer from '@/components/site/CartDrawer';
 import { api } from '@/lib/api';
 import { Product } from '@/types';
 import { useCart } from '@/hooks/useCart';
+import { getUploadUrl } from '@/utils';
 
 export default function ProductPage() {
   const params = useParams();
@@ -110,7 +111,7 @@ export default function ProductPage() {
               {/* Main Image */}
               <div className="relative aspect-square rounded-2xl overflow-hidden bg-neutral-800">
                 {images.length > 0 ? (
-                  <Image src={images[selectedImage]?.image_url || ''} alt={images[selectedImage]?.alt_text || product.name} fill className="object-cover" priority />
+                  <Image src={getUploadUrl(images[selectedImage]?.image_url)} alt={images[selectedImage]?.alt_text || product.name} fill className="object-cover" priority />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <svg className="w-24 h-24 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +126,7 @@ export default function ProductPage() {
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {images.map((img, index) => (
                     <button key={img.id} onClick={() => setSelectedImage(index)} className={`relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${selectedImage === index ? 'border-amber-500' : 'border-transparent hover:border-neutral-600'}`}>
-                      <Image src={img.image_url} alt={img.alt_text || ''} fill className="object-cover" />
+                      <Image src={getUploadUrl(img.image_url)} alt={img.alt_text || ''} fill className="object-cover" />
                     </button>
                   ))}
                 </div>

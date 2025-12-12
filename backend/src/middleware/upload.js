@@ -126,15 +126,22 @@ const processImage = async (inputPath, outputDir, options = {}) => {
   }
 
   // Extrair o tipo de pasta (products, banners, logo) do caminho
-  const uploadsIndex = outputDir.indexOf('uploads');
-  const relativePath = uploadsIndex !== -1 
-    ? outputDir.substring(uploadsIndex + 'uploads'.length)
+  // Normalizar para sempre usar barras normais (/)
+  const normalizedDir = outputDir.replace(/\\/g, '/');
+  const uploadsIndex = normalizedDir.indexOf('uploads');
+  let relativePath = uploadsIndex !== -1 
+    ? normalizedDir.substring(uploadsIndex + 'uploads'.length)
     : '';
+  
+  // Garantir que começa com /
+  if (relativePath && !relativePath.startsWith('/')) {
+    relativePath = '/' + relativePath;
+  }
   
   return {
     filename,
     path: outputPath,
-    url: `${relativePath}/${filename}`,
+    url: `${relativePath}/${filename}`.replace(/\/+/g, '/'),
     width: metadata.width,
     height: metadata.height,
     format: metadata.format,

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Category } from '@/types';
+import { getUploadUrl } from '@/utils';
 
 interface CategoryCardProps {
   category: Category;
@@ -17,7 +18,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
         className="group relative h-64 rounded-2xl overflow-hidden bg-neutral-800 border border-neutral-700 hover:border-amber-500/50 transition-all duration-300"
       >
         {category.image ? (
-          <Image src={category.image} alt={category.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+          <Image src={getUploadUrl(category.image)} alt={category.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900" />
         )}

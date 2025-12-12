@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Banner } from '@/types';
+import { getUploadUrl } from '@/utils';
 
 interface HeroCarouselProps {
   banners: Banner[];
@@ -55,6 +56,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
   }
 
   const currentBanner = banners[currentIndex];
+  const imageUrl = getUploadUrl(currentBanner.image_desktop);
 
   return (
     <div className="relative h-[600px] md:h-[700px] overflow-hidden bg-neutral-900">
@@ -71,7 +73,7 @@ export default function HeroCarousel({ banners }: HeroCarouselProps) {
           {currentBanner.image_desktop && (
             <div className="absolute inset-0">
               <Image
-                src={currentBanner.image_desktop}
+                src={imageUrl}
                 alt={currentBanner.title || 'Banner'}
                 fill
                 className="object-cover"

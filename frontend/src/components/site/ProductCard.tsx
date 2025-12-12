@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Product } from '@/types';
 import { useCart } from '@/hooks/useCart';
+import { getUploadUrl } from '@/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +23,7 @@ export default function ProductCard({ product, showAddToCart = true }: ProductCa
   };
 
   const productUrl = `/equipamentos/${product.category_slug}/${product.slug}`;
+  const imageUrl = getUploadUrl(product.featured_image);
 
   return (
     <motion.div
@@ -33,7 +35,7 @@ export default function ProductCard({ product, showAddToCart = true }: ProductCa
         <div className="relative aspect-square overflow-hidden bg-neutral-800">
           {product.featured_image ? (
             <Image
-              src={product.featured_image}
+              src={imageUrl}
               alt={product.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"

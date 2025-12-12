@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
 import { Category } from '@/types';
+import { getUploadUrl } from '@/utils';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -107,7 +108,7 @@ export default function AdminCategoriesPage() {
             <motion.div key={category.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-neutral-900 rounded-xl border border-neutral-800 overflow-hidden">
               {category.image && (
                 <div className="relative h-32 bg-neutral-800">
-                  <Image src={category.image} alt={category.name} fill className="object-cover" />
+                  <Image src={getUploadUrl(category.image)} alt={category.name} fill className="object-cover" />
                 </div>
               )}
               <div className="p-6">

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
 import QuotationModal from './QuotationModal';
+import { getUploadUrl } from '@/utils';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, getTotalItems, clearCart } = useCart();
@@ -71,7 +72,7 @@ export default function CartDrawer() {
                         {/* Image */}
                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-neutral-700 flex-shrink-0">
                           {item.product.featured_image ? (
-                            <Image src={item.product.featured_image} alt={item.product.name} width={80} height={80} className="w-full h-full object-cover" />
+                            <Image src={getUploadUrl(item.product.featured_image)} alt={item.product.name} width={80} height={80} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

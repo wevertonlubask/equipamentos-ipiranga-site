@@ -20,7 +20,7 @@ class Quotation {
 
     // Buscar itens da cotação
     const items = await query(
-      `SELECT qi.*, p.slug as product_slug, p.featured_image
+      `SELECT qi.*, p.slug as product_slug, p.sku as product_sku, p.featured_image
        FROM quotation_items qi
        LEFT JOIN products p ON qi.product_id = p.id
        WHERE qi.quotation_id = ?`,

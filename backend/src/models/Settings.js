@@ -91,6 +91,17 @@ class Settings {
   }
 
   /**
+   * Obtém todas as configurações como array plano
+   * @returns {Promise<Array>}
+   */
+  static async getAllFlat() {
+    const rows = await query(
+      'SELECT setting_key, setting_value FROM site_settings ORDER BY setting_key'
+    );
+    return rows;
+  }
+
+  /**
    * Obtém configurações públicas (para exibir no site)
    * @returns {Promise<Object>}
    */

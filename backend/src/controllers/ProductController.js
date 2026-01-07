@@ -248,6 +248,10 @@ class ProductController {
     try {
       const { id } = req.params;
 
+      console.log('📸 Adicionando imagem ao produto:', id);
+      console.log('📸 req.processedImage:', req.processedImage);
+      console.log('📸 req.body:', req.body);
+
       const product = await Product.findById(id);
       if (!product) {
         return res.status(404).json({
@@ -258,21 +262,32 @@ class ProductController {
 
       // Usar imagem processada do middleware
       if (req.processedImage) {
-        const images = await Product.addImages(id, [{
+        const imageData = {
           image_url: req.processedImage.url,
           alt_text: req.body.alt_text || product.name,
           is_primary: req.body.is_primary === 'true'
-        }]);
+        };
+
+        console.log('📸 Salvando imagem:', imageData);
+
+        const images = await Product.addImages(id, [imageData]);
 
         // Se é primary, atualizar featured_image do produto
         if (req.body.is_primary === 'true') {
           await Product.update(id, { featured_image: req.processedImage.url });
+          console.log('📸 Featured image atualizada:', req.processedImage.url);
         }
 
+        // Retornar dados completos
         return res.status(201).json({
           success: true,
           message: 'Imagem adicionada com sucesso',
-          data: images[0]
+          data: {
+            id: images[0].id,
+            image_url: req.processedImage.url,
+            alt_text: imageData.alt_text,
+            is_primary: imageData.is_primary
+          }
         });
       }
 

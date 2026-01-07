@@ -25,8 +25,8 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
     description: product?.description || '',
     category_id: product?.category_id?.toString() || '',
     sku: product?.sku || '',
-    is_featured: product?.is_featured || false,
-    is_active: product?.is_active ?? true,
+    is_featured: Boolean(product?.is_featured),
+    is_active: product?.is_active !== undefined ? Boolean(product.is_active) : true,
     meta_title: product?.meta_title || '',
     meta_description: product?.meta_description || '',
     specifications: product?.specifications || {},
@@ -79,20 +79,35 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
     if (!file) return;
 
     setUploadingImage(true);
-    const formDataUpload = new FormData();
-    formDataUpload.append('image', file);
 
     try {
       if (isEdit && product?.id) {
-        const res = await api.post(`/products/${product.id}/images`, formDataUpload, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        if (isPrimary) {
-          setFeaturedImage(res.data.image_url);
+        // Upload real para produto existente
+        const formDataUpload = new FormData();
+        formDataUpload.append('image', file);
+        formDataUpload.append('is_primary', isPrimary ? 'true' : 'false');
+
+        const res = await api.upload(`/products/${product.id}/images`, formDataUpload);
+        
+        console.log('Upload response:', res);
+        
+        if (res.data) {
+          if (isPrimary && res.data.image_url) {
+            setFeaturedImage(res.data.image_url);
+          }
+          // Recarregar produto para atualizar lista de imagens
+          const productRes = await api.get(`/products/${product.id}`);
+          if (productRes.data?.images) {
+            setImages(productRes.data.images);
+          }
+          if (productRes.data?.featured_image) {
+            setFeaturedImage(productRes.data.featured_image);
+          }
         }
-        setImages(res.data.images || []);
+        
+        alert('Imagem enviada com sucesso!');
       } else {
-        // For new products, just preview the image
+        // Para novos produtos, apenas preview
         const reader = new FileReader();
         reader.onload = (e) => {
           if (isPrimary) {
@@ -101,11 +116,13 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
         };
         reader.readAsDataURL(file);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro no upload:', error);
-      alert('Erro ao fazer upload da imagem');
+      alert(error.message || 'Erro ao fazer upload da imagem');
     } finally {
       setUploadingImage(false);
+      // Limpar input
+      e.target.value = '';
     }
   };
 
@@ -114,10 +131,30 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
     setLoading(true);
 
     try {
-      const payload = {
-        ...formData,
-        category_id: parseInt(formData.category_id),
+      // Construir payload com tipos corretos
+      const payload: any = {
+        name: formData.name,
+        slug: formData.slug || null,
+        short_description: formData.short_description || null,
+        description: formData.description || null,
+        sku: formData.sku || null,
+        is_featured: Boolean(formData.is_featured),
+        is_active: Boolean(formData.is_active),
+        meta_title: formData.meta_title || null,
+        meta_description: formData.meta_description || null,
+        specifications: formData.specifications && Object.keys(formData.specifications).length > 0 
+          ? formData.specifications 
+          : null,
       };
+
+      // category_id: converter para número ou null
+      if (formData.category_id && formData.category_id !== '') {
+        payload.category_id = parseInt(formData.category_id);
+      } else {
+        payload.category_id = null;
+      }
+
+      console.log('Enviando payload:', payload);
 
       if (isEdit && product?.id) {
         await api.put(`/products/${product.id}`, payload);
@@ -127,7 +164,14 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
 
       router.push('/admin/produtos');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao salvar produto');
+      console.error('Erro ao salvar:', error);
+      // Mostrar detalhes do erro de validação
+      if (error.errors && Array.isArray(error.errors)) {
+        const errorMessages = error.errors.map((e: any) => `${e.field}: ${e.message}`).join('\n');
+        alert(`Erros de validação:\n${errorMessages}`);
+      } else {
+        alert(error.message || 'Erro ao salvar produto');
+      }
     } finally {
       setLoading(false);
     }
@@ -262,10 +306,25 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
               
               <label className="block">
                 <span className="sr-only">Escolher imagem</span>
-                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} disabled={uploadingImage} className="block w-full text-sm text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-500 file:text-neutral-900 file:font-semibold hover:file:bg-amber-400 file:cursor-pointer cursor-pointer" />
+                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, true)} disabled={uploadingImage} className="block w-full text-sm text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-500 file:text-neutral-900 file:font-semibold hover:file:bg-amber-400 file:cursor-pointer cursor-pointer disabled:opacity-50" />
               </label>
+              {uploadingImage && <p className="text-amber-500 text-sm">Enviando imagem...</p>}
             </div>
           </div>
+
+          {/* Gallery */}
+          {isEdit && images.length > 0 && (
+            <div className="bg-neutral-900 rounded-xl p-6 border border-neutral-800">
+              <h2 className="text-lg font-bold text-white mb-4">Galeria ({images.length})</h2>
+              <div className="grid grid-cols-3 gap-2">
+                {images.map((img: any) => (
+                  <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden bg-neutral-800">
+                    <Image src={getUploadUrl(img.image_url)} alt="" fill className="object-cover" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="bg-neutral-900 rounded-xl p-6 border border-neutral-800">

@@ -109,7 +109,16 @@ class QuotationController {
    */
   static async create(req, res) {
     try {
+      console.log('Recebendo cotação:', JSON.stringify(req.body, null, 2));
+      
       const { items, ...customerData } = req.body;
+
+      if (!items || items.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nenhum item na cotação'
+        });
+      }
 
       // Validar se os produtos existem
       const productIds = items.map(item => item.product_id);
@@ -134,13 +143,15 @@ class QuotationController {
       // Capturar informações do cliente
       const quotationData = {
         ...customerData,
-        ip_address: req.ip || req.connection.remoteAddress,
-        user_agent: req.get('User-Agent')
+        ip_address: req.ip || req.connection?.remoteAddress || null,
+        user_agent: req.get('User-Agent') || null
       };
+
+      console.log('Criando cotação com dados:', JSON.stringify(quotationData, null, 2));
 
       const quotation = await Quotation.create(quotationData, enrichedItems);
 
-      // TODO: Enviar email de notificação
+      console.log('Cotação criada com sucesso:', quotation.id);
 
       res.status(201).json({
         success: true,

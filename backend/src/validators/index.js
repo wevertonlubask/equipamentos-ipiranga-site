@@ -14,6 +14,8 @@ const Joi = require('joi');
  */
 const validate = (schema, property = 'body') => {
   return (req, res, next) => {
+    console.log(`🔍 Validando ${property}:`, JSON.stringify(req[property], null, 2));
+    
     const { error, value } = schema.validate(req[property], {
       abortEarly: false,
       stripUnknown: true
@@ -24,6 +26,8 @@ const validate = (schema, property = 'body') => {
         field: detail.path.join('.'),
         message: detail.message.replace(/"/g, '')
       }));
+
+      console.log('❌ Erros de validação:', errors);
 
       return res.status(400).json({
         success: false,
@@ -132,7 +136,7 @@ const productSchemas = {
       Joi.object(),
       Joi.string()
     ).allow(null),
-    category_id: Joi.number().integer(),
+    category_id: Joi.number().integer().allow(null),
     sku: Joi.string().max(50).allow('', null),
     featured_image: Joi.string().max(255).allow('', null),
     is_featured: Joi.boolean(),

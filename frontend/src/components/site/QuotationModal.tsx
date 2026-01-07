@@ -74,22 +74,49 @@ export default function QuotationModal({ isOpen, onClose }: QuotationModalProps)
     setLoading(true);
     setError('');
 
+    // Validação básica no frontend
+    if (items.length === 0) {
+      setError('Adicione pelo menos um produto ao carrinho.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const payload = {
-        ...formData,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        email: formData.email,
+        phone: formData.phone,
+        company_name: formData.company_name || null,
+        cnpj: formData.cnpj || null,
+        installation_type: formData.installation_type,
+        installation_type_other: formData.installation_type_other || null,
+        city: formData.city || null,
+        state: formData.state || null,
+        message: formData.message || null,
         items: items.map((item) => ({
           product_id: item.product.id,
           product_name: item.product.name,
           quantity: item.quantity,
-          notes: item.notes || '',
+          notes: ''
         })),
       };
 
+      console.log('Enviando cotação:', payload);
       await api.post('/quotations', payload);
       setSuccess(true);
       clearCart();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao enviar cotação. Tente novamente.');
+      console.error('Erro ao enviar cotação:', err);
+      
+      // Tratar diferentes tipos de erro
+      if (err.errors && Array.isArray(err.errors)) {
+        // Erros de validação do backend
+        const errorMessages = err.errors.map((e: any) => e.message).join('. ');
+        setError(errorMessages || 'Verifique os campos e tente novamente.');
+      } else {
+        setError(err.message || 'Erro ao enviar cotação. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }

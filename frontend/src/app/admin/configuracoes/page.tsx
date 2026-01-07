@@ -28,7 +28,8 @@ export default function AdminSettingsPage() {
       await api.put('/settings', settings);
       alert('Configurações salvas com sucesso!');
     } catch (e: any) {
-      alert(e.response?.data?.message || 'Erro ao salvar');
+      console.error('Erro ao salvar configurações:', e);
+      alert(e.message || 'Erro ao salvar');
     } finally {
       setSaving(false);
     }

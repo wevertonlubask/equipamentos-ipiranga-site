@@ -139,8 +139,11 @@ export interface QuotationItem {
   product_id: number;
   product_name: string;
   product_slug?: string;
+  product_sku?: string;
   featured_image?: string;
   quantity: number;
+  unit_price?: number;
+  total_price?: number;
   notes?: string;
   created_at?: string;
 }

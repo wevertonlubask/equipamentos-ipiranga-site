@@ -128,20 +128,28 @@ const processImage = async (inputPath, outputDir, options = {}) => {
   // Extrair o tipo de pasta (products, banners, logo) do caminho
   // Normalizar para sempre usar barras normais (/)
   const normalizedDir = outputDir.replace(/\\/g, '/');
-  const uploadsIndex = normalizedDir.indexOf('uploads');
-  let relativePath = uploadsIndex !== -1 
-    ? normalizedDir.substring(uploadsIndex + 'uploads'.length)
-    : '';
+  const parts = normalizedDir.split('/');
+  const uploadsIndex = parts.indexOf('uploads');
   
-  // Garantir que começa com /
-  if (relativePath && !relativePath.startsWith('/')) {
-    relativePath = '/' + relativePath;
+  let relativePath = '';
+  if (uploadsIndex !== -1 && uploadsIndex < parts.length - 1) {
+    // Pega tudo depois de 'uploads'
+    relativePath = '/' + parts.slice(uploadsIndex + 1).join('/');
   }
+  
+  const finalUrl = `${relativePath}/${filename}`.replace(/\/+/g, '/');
+  
+  console.log('📸 Imagem processada:', {
+    outputDir: normalizedDir,
+    relativePath,
+    filename,
+    finalUrl
+  });
   
   return {
     filename,
     path: outputPath,
-    url: `${relativePath}/${filename}`.replace(/\/+/g, '/'),
+    url: finalUrl,
     width: metadata.width,
     height: metadata.height,
     format: metadata.format,
@@ -153,36 +161,64 @@ const processImage = async (inputPath, outputDir, options = {}) => {
  * Middleware para processar imagem de produto
  */
 const processProductImage = async (req, res, next) => {
-  if (!req.file) return next();
+  console.log('📷 processProductImage - req.file:', req.file);
+  
+  if (!req.file) {
+    console.log('📷 Nenhum arquivo recebido');
+    return next();
+  }
 
   try {
-    const processed = await processImage(
-      req.file.path,
-      UPLOAD_DIRS.products,
-      { width: 1200, height: 1200, quality: 85 }
-    );
+    console.log('📷 Processando imagem:', req.file.path);
+    
+    // Gerar nome base para os arquivos
+    const baseName = uuidv4();
+    const mainFilename = `${baseName}.webp`;
+    const thumbFilename = `${baseName}_thumb.webp`;
+    
+    const mainOutputPath = path.join(UPLOAD_DIRS.products, mainFilename);
+    const thumbOutputPath = path.join(UPLOAD_DIRS.products, thumbFilename);
 
-    // Criar thumbnail
-    const thumbnail = await processImage(
-      path.join(UPLOAD_DIRS.products, processed.filename),
-      UPLOAD_DIRS.products,
-      { width: 400, height: 400, quality: 80 }
-    );
+    // Processar imagem principal
+    await sharp(req.file.path)
+      .resize(1200, 1200, { fit: 'cover', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toFile(mainOutputPath);
 
-    // Renomear thumbnail
-    const thumbFilename = processed.filename.replace('.webp', '_thumb.webp');
-    await fs.rename(
-      path.join(UPLOAD_DIRS.products, thumbnail.filename),
-      path.join(UPLOAD_DIRS.products, thumbFilename)
-    );
+    console.log('📷 Imagem principal salva:', mainOutputPath);
+
+    // Processar thumbnail diretamente do arquivo original
+    await sharp(req.file.path)
+      .resize(400, 400, { fit: 'cover', withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toFile(thumbOutputPath);
+
+    console.log('📷 Thumbnail salva:', thumbOutputPath);
+
+    // Obter metadados da imagem principal
+    const metadata = await sharp(mainOutputPath).metadata();
+
+    // Remover arquivo temporário
+    try {
+      await fs.unlink(req.file.path);
+    } catch (e) {
+      console.log('📷 Aviso: não foi possível remover arquivo temp:', e.message);
+    }
 
     req.processedImage = {
-      ...processed,
+      filename: mainFilename,
+      path: mainOutputPath,
+      url: `/products/${mainFilename}`,
+      width: metadata.width,
+      height: metadata.height,
+      format: metadata.format,
       thumbnail: {
         filename: thumbFilename,
         url: `/products/${thumbFilename}`
       }
     };
+
+    console.log('📷 req.processedImage final:', req.processedImage);
 
     next();
   } catch (error) {

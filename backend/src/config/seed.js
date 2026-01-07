@@ -370,6 +370,33 @@ async function seed() {
       console.log(`   ✅ Banner: ${banner.title}`);
     }
 
+    // Inserir configurações do site
+    console.log('\n⚙️  Inserindo configurações do site...');
+    const siteSettings = [
+      { key: 'site_name', value: 'Ipiranga Fitness', group: 'general' },
+      { key: 'site_description', value: 'Fábrica de equipamentos de musculação de alta performance desde 1969', group: 'general' },
+      { key: 'contact_email', value: 'contato@equipamentosipiranga.com.br', group: 'contact' },
+      { key: 'contact_phone', value: '(18) 3222-1234', group: 'contact' },
+      { key: 'contact_whatsapp', value: '5518999999999', group: 'contact' },
+      { key: 'contact_address', value: 'Rua José Bongiovani, 1000 - Presidente Prudente/SP', group: 'contact' },
+      { key: 'social_instagram', value: 'https://instagram.com/ipirangafitness', group: 'social' },
+      { key: 'social_facebook', value: 'https://facebook.com/ipirangafitness', group: 'social' },
+      { key: 'social_youtube', value: '', group: 'social' },
+      { key: 'social_linkedin', value: '', group: 'social' },
+      { key: 'meta_title', value: 'Ipiranga Fitness - Equipamentos de Musculação', group: 'seo' },
+      { key: 'meta_description', value: 'Fábrica de equipamentos de musculação desde 1969. Máquinas de alta performance para academias e centros de treinamento.', group: 'seo' },
+      { key: 'meta_keywords', value: 'equipamentos musculação, academia, máquinas fitness, ipiranga fitness', group: 'seo' },
+    ];
+
+    for (const setting of siteSettings) {
+      await query(`
+        INSERT INTO site_settings (setting_key, setting_value, setting_group, setting_type)
+        VALUES (?, ?, ?, 'text')
+        ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)
+      `, [setting.key, setting.value, setting.group]);
+    }
+    console.log(`   ✅ ${siteSettings.length} configurações inseridas`);
+
     console.log('\n✨ Seed concluído com sucesso!\n');
     console.log('📋 Resumo:');
     console.log(`   - ${categories.length} categorias`);

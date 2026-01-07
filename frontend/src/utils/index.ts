@@ -167,8 +167,11 @@ export function getUploadUrl(path?: string): string {
   if (!path) return '/images/placeholder.jpg';
   if (path.startsWith('http')) return path;
   
+  // Normalizar barras (Windows usa \, converter para /)
+  const normalizedPath = path.replace(/\\/g, '/');
+  
   const baseUrl = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:3001/uploads';
-  return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  return `${baseUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
 }
 
 /**

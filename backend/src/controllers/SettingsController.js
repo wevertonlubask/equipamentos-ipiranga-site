@@ -15,7 +15,7 @@ class SettingsController {
    */
   static async index(req, res) {
     try {
-      const settings = await Settings.getAll();
+      const settings = await Settings.getAllFlat();
 
       res.json({
         success: true,

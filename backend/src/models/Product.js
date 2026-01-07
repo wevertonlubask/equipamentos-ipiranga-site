@@ -8,6 +8,30 @@
 const { query, beginTransaction } = require('../config/database');
 const slugify = require('slugify');
 
+/**
+ * Normaliza URLs de imagens (converte barras invertidas para normais)
+ */
+function normalizeImageUrl(url) {
+  if (!url) return url;
+  return url.replace(/\\/g, '/');
+}
+
+/**
+ * Normaliza um produto (URLs de imagens)
+ */
+function normalizeProduct(product) {
+  if (!product) return product;
+  
+  return {
+    ...product,
+    featured_image: normalizeImageUrl(product.featured_image),
+    images: product.images ? product.images.map(img => ({
+      ...img,
+      image_url: normalizeImageUrl(img.image_url)
+    })) : []
+  };
+}
+
 class Product {
   /**
    * Encontra um produto pelo ID
@@ -31,11 +55,11 @@ class Product {
       [id]
     );
 
-    return {
+    return normalizeProduct({
       ...rows[0],
       specifications: rows[0].specifications ? JSON.parse(rows[0].specifications) : {},
       images
-    };
+    });
   }
 
   /**
@@ -63,11 +87,11 @@ class Product {
       [rows[0].id]
     );
 
-    return {
+    return normalizeProduct({
       ...rows[0],
       specifications: rows[0].specifications ? JSON.parse(rows[0].specifications) : {},
       images
-    };
+    });
   }
 
   /**
@@ -138,9 +162,10 @@ class Product {
 
     const rows = await query(sql, params);
 
-    // Processar specifications
+    // Processar specifications e normalizar URLs
     const products = rows.map(row => ({
       ...row,
+      featured_image: normalizeImageUrl(row.featured_image),
       specifications: row.specifications ? JSON.parse(row.specifications) : {}
     }));
 
@@ -173,6 +198,7 @@ class Product {
 
     return rows.map(row => ({
       ...row,
+      featured_image: normalizeImageUrl(row.featured_image),
       specifications: row.specifications ? JSON.parse(row.specifications) : {}
     }));
   }
@@ -197,6 +223,7 @@ class Product {
 
     return rows.map(row => ({
       ...row,
+      featured_image: normalizeImageUrl(row.featured_image),
       specifications: row.specifications ? JSON.parse(row.specifications) : {}
     }));
   }

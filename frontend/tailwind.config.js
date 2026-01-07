@@ -10,16 +10,16 @@ module.exports = {
       colors: {
         primary: {
           50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#DC2626', // Vermelho principal
-          600: '#B91C1C',
-          700: '#991B1B',
-          800: '#7F1D1D',
-          900: '#450A0A',
-          950: '#2D0606',
+          100: '#fde3e3',
+          200: '#fccbcb',
+          300: '#f9a8a8',
+          400: '#f47676',
+          500: '#c02c2a', // Vermelho principal da logo
+          600: '#a82624',
+          700: '#8c201f',
+          800: '#741d1c',
+          900: '#611d1c',
+          950: '#340b0a',
         },
         secondary: {
           50: '#f8fafc',
@@ -137,7 +137,7 @@ module.exports = {
         'elevation-2': '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
         'elevation-3': '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
         'elevation-4': '0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)',
-        'red-glow': '0 0 20px rgba(220, 38, 38, 0.3)',
+        'red-glow': '0 0 20px rgba(192, 44, 42, 0.3)',
         'gold-glow': '0 0 20px rgba(234, 179, 8, 0.3)',
       },
       
@@ -169,7 +169,7 @@ module.exports = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
         'hero-pattern': "url('/images/patterns/hero-pattern.svg')",
-        'mesh-gradient': 'linear-gradient(135deg, #DC2626 0%, #991B1B 50%, #450A0A 100%)',
+        'mesh-gradient': 'linear-gradient(135deg, #c02c2a 0%, #8c201f 50%, #340b0a 100%)',
       },
       
       // Transições

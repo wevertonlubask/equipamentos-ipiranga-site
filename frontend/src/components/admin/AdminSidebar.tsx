@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { getUploadUrl } from '@/utils';
 
 const menuItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: (
@@ -31,10 +33,31 @@ export default function AdminSidebar() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<{
+    site_logo?: string;
+    site_logo_dark?: string;
+    site_name?: string;
+  }>({});
 
   useEffect(() => {
     const userData = localStorage.getItem('admin_user');
     if (userData) setUser(JSON.parse(userData));
+  }, []);
+
+  // Carregar configuracoes do site
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/settings/public`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setSiteSettings(data.data);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar configuracoes:', error);
+      }
+    };
+    loadSettings();
   }, []);
 
   const handleLogout = () => {
@@ -47,8 +70,33 @@ export default function AdminSidebar() {
     <aside className={`bg-neutral-900 border-r border-neutral-800 h-screen sticky top-0 flex flex-col transition-all duration-300 ${collapsed ? 'w-20' : 'w-64'}`}>
       {/* Header */}
       <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
-        {!collapsed && <span className="text-xl font-bold text-white">IPIRANGA<span className="text-amber-500">FIT</span></span>}
-        <button onClick={() => setCollapsed(!collapsed)} className="p-2 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors">
+        {!collapsed && (
+          <Link href="/admin/dashboard" className="flex items-center">
+            {siteSettings.site_logo_dark || siteSettings.site_logo ? (
+              <Image
+                src={getUploadUrl(siteSettings.site_logo_dark || siteSettings.site_logo || '')}
+                alt={siteSettings.site_name || 'Ipiranga Fitness'}
+                width={140}
+                height={40}
+                className="h-8 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-xl font-bold text-white">IPIRANGA<span className="text-amber-500">FIT</span></span>
+            )}
+          </Link>
+        )}
+        {collapsed && (siteSettings.site_logo_dark || siteSettings.site_logo) && (
+          <Link href="/admin/dashboard" className="flex items-center justify-center w-full">
+            <Image
+              src={getUploadUrl(siteSettings.site_logo_dark || siteSettings.site_logo || '')}
+              alt={siteSettings.site_name || 'Ipiranga Fitness'}
+              width={40}
+              height={40}
+              className="h-8 w-8 object-contain"
+            />
+          </Link>
+        )}
+        <button onClick={() => setCollapsed(!collapsed)} className={`p-2 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors ${collapsed ? 'mx-auto' : ''}`}>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? "M13 5l7 7-7 7M5 5l7 7-7 7" : "M11 19l-7-7 7-7m8 14l-7-7 7-7"} />
           </svg>

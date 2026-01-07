@@ -7,6 +7,8 @@
 import type { Metadata } from 'next';
 import { Inter, Oswald, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import ThemeProvider from '@/components/ThemeProvider';
+import DynamicFavicon from '@/components/DynamicFavicon';
 import '@/styles/globals.css';
 
 // Configuração das fontes
@@ -113,8 +115,11 @@ export default function RootLayout({
       className={`${inter.variable} ${oswald.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-white antialiased">
-        {children}
-        
+        <DynamicFavicon />
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
+
         {/* Sistema de notificações */}
         <Toaster
           position="top-right"

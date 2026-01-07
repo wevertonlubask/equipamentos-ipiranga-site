@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/useCart';
+import { getUploadUrl } from '@/utils';
 
 const navigation = [
   { name: 'Home', href: '/' },
@@ -29,10 +31,33 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [siteSettings, setSiteSettings] = useState<{
+    site_logo?: string;
+    site_logo_dark?: string;
+    site_name?: string;
+    contact_phone?: string;
+    social_instagram?: string;
+  }>({});
   const pathname = usePathname();
-  
+
   const { items, openCart } = useCart();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Carregar configuracoes do site
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/settings/public`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setSiteSettings(data.data);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar configuracoes:', error);
+      }
+    };
+    loadSettings();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -74,13 +99,26 @@ export default function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-11 h-11 bg-amber-500 rounded-xl flex items-center justify-center group-hover:bg-amber-400 transition-colors">
-                <svg className="w-6 h-6 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16m-7 6h7" /></svg>
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-xl font-bold text-white leading-none">IPIRANGA</span>
-                <span className="block text-xs text-neutral-500 uppercase tracking-wider">Fitness Equipment</span>
-              </div>
+              {siteSettings.site_logo_dark || siteSettings.site_logo ? (
+                <Image
+                  src={getUploadUrl(siteSettings.site_logo_dark || siteSettings.site_logo || '')}
+                  alt={siteSettings.site_name || 'Ipiranga Fitness'}
+                  width={180}
+                  height={50}
+                  className="h-10 w-auto object-contain"
+                  priority
+                />
+              ) : (
+                <>
+                  <div className="w-11 h-11 bg-amber-500 rounded-xl flex items-center justify-center group-hover:bg-amber-400 transition-colors">
+                    <svg className="w-6 h-6 text-neutral-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                  </div>
+                  <div className="hidden sm:block">
+                    <span className="text-xl font-bold text-white leading-none">IPIRANGA</span>
+                    <span className="block text-xs text-neutral-500 uppercase tracking-wider">Fitness Equipment</span>
+                  </div>
+                </>
+              )}
             </Link>
 
             {/* Navegação Desktop */}

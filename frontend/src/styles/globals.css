@@ -13,17 +13,36 @@
 /* ============================================= */
 
 :root {
-  --color-primary: #DC2626;
-  --color-primary-dark: #991B1B;
+  /* Cores do tema - serao sobrescritas pelo ThemeProvider */
+  --color-primary: #c02c2a;
+  --color-primary-50: #fef2f2;
+  --color-primary-100: #fde3e3;
+  --color-primary-200: #fccbcb;
+  --color-primary-300: #f9a8a8;
+  --color-primary-400: #f47676;
+  --color-primary-500: #c02c2a;
+  --color-primary-600: #a82624;
+  --color-primary-700: #8c201f;
+  --color-primary-800: #741d1c;
+  --color-primary-900: #611d1c;
+  --color-primary-rgb: 192, 44, 42;
+
   --color-secondary: #1f2937;
+  --color-secondary-dark: #111827;
+  --color-secondary-light: #374151;
+  --color-secondary-rgb: 31, 41, 55;
+
   --color-accent: #eab308;
-  
+  --color-accent-dark: #ca8a04;
+  --color-accent-light: #facc15;
+  --color-accent-rgb: 234, 179, 8;
+
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-display: 'Oswald', system-ui, sans-serif;
-  
+
   --header-height: 80px;
   --header-height-scrolled: 64px;
-  
+
   --transition-fast: 150ms;
   --transition-normal: 300ms;
   --transition-slow: 500ms;
@@ -307,6 +326,110 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
+  }
+
+  /* ============================================= */
+  /* CLASSES COM CORES DINAMICAS DO TEMA */
+  /* ============================================= */
+
+  /* Botao com cor primaria dinamica */
+  .btn-theme-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-theme-primary:hover {
+    background-color: var(--color-primary-600);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+  }
+  .btn-theme-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Botao com cor de destaque dinamica */
+  .btn-theme-accent {
+    background-color: var(--color-accent);
+    color: #171717;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-theme-accent:hover {
+    background-color: var(--color-accent-dark);
+  }
+  .btn-theme-accent:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Botao outline com cor primaria dinamica */
+  .btn-theme-outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-theme-outline:hover {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  /* Background com cor primaria */
+  .bg-theme-primary {
+    background-color: var(--color-primary) !important;
+  }
+  .bg-theme-primary-light {
+    background-color: var(--color-primary-100) !important;
+  }
+
+  /* Background com cor secundaria */
+  .bg-theme-secondary {
+    background-color: var(--color-secondary) !important;
+  }
+
+  /* Background com cor de destaque */
+  .bg-theme-accent {
+    background-color: var(--color-accent) !important;
+  }
+
+  /* Texto com cor primaria */
+  .text-theme-primary {
+    color: var(--color-primary) !important;
+  }
+
+  /* Texto com cor de destaque */
+  .text-theme-accent {
+    color: var(--color-accent) !important;
+  }
+
+  /* Borda com cor primaria */
+  .border-theme-primary {
+    border-color: var(--color-primary) !important;
+  }
+
+  /* Ring/Focus com cor primaria */
+  .ring-theme-primary {
+    --tw-ring-color: var(--color-primary) !important;
   }
 }
 

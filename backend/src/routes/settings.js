@@ -9,7 +9,7 @@ const express = require('express');
 const router = express.Router();
 const SettingsController = require('../controllers/SettingsController');
 const { authenticate, isAdmin } = require('../middleware/auth');
-const { upload, processLogoImage } = require('../middleware/upload');
+const { upload, processLogoImage, processFaviconImage } = require('../middleware/upload');
 const { validate, settingsSchemas } = require('../validators');
 
 // =============================================
@@ -88,6 +88,6 @@ router.post('/logo', authenticate, isAdmin, upload.single('logo'), processLogoIm
  * @description Upload de favicon
  * @access Private (Admin)
  */
-router.post('/favicon', authenticate, isAdmin, upload.single('favicon'), processLogoImage, SettingsController.uploadFavicon);
+router.post('/favicon', authenticate, isAdmin, upload.single('favicon'), processFaviconImage, SettingsController.uploadFavicon);
 
 module.exports = router;

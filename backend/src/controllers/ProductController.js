@@ -271,9 +271,10 @@ class ProductController {
         console.log('📸 Salvando imagem:', imageData);
 
         const images = await Product.addImages(id, [imageData]);
+        const savedImage = images[0];
 
-        // Se é primary, atualizar featured_image do produto
-        if (req.body.is_primary === 'true') {
+        // Se a imagem foi definida como principal (seja por solicitação ou automaticamente como primeira)
+        if (savedImage.is_primary) {
           await Product.update(id, { featured_image: req.processedImage.url });
           console.log('📸 Featured image atualizada:', req.processedImage.url);
         }
@@ -283,10 +284,10 @@ class ProductController {
           success: true,
           message: 'Imagem adicionada com sucesso',
           data: {
-            id: images[0].id,
+            id: savedImage.id,
             image_url: req.processedImage.url,
             alt_text: imageData.alt_text,
-            is_primary: imageData.is_primary
+            is_primary: savedImage.is_primary
           }
         });
       }

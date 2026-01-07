@@ -74,6 +74,26 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
     setFormData(prev => ({ ...prev, specifications: specs }));
   };
 
+  const handleSetPrimaryImage = async (imageId: number, imageUrl: string) => {
+    if (!product?.id) return;
+
+    try {
+      await api.put(`/products/${product.id}/images/${imageId}/primary`);
+
+      // Atualizar estado local
+      setFeaturedImage(imageUrl);
+      setImages(prev => prev.map((img: any) => ({
+        ...img,
+        is_primary: img.id === imageId
+      })));
+
+      alert('Imagem principal atualizada!');
+    } catch (error: any) {
+      console.error('Erro ao definir imagem principal:', error);
+      alert(error.message || 'Erro ao definir imagem principal');
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isPrimary = false) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -316,10 +336,32 @@ export default function ProductForm({ product, isEdit }: ProductFormProps) {
           {isEdit && images.length > 0 && (
             <div className="bg-neutral-900 rounded-xl p-6 border border-neutral-800">
               <h2 className="text-lg font-bold text-white mb-4">Galeria ({images.length})</h2>
+              <p className="text-neutral-400 text-xs mb-3">Clique na estrela para definir como principal</p>
               <div className="grid grid-cols-3 gap-2">
                 {images.map((img: any) => (
-                  <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden bg-neutral-800">
+                  <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden bg-neutral-800 group">
                     <Image src={getUploadUrl(img.image_url)} alt="" fill className="object-cover" />
+                    {/* Indicador de imagem principal */}
+                    <button
+                      type="button"
+                      onClick={() => handleSetPrimaryImage(img.id, img.image_url)}
+                      className={`absolute top-1 left-1 p-1.5 rounded-full transition-all ${
+                        img.is_primary || featuredImage === img.image_url
+                          ? 'bg-amber-500 text-neutral-900'
+                          : 'bg-black/50 text-white opacity-0 group-hover:opacity-100 hover:bg-amber-500 hover:text-neutral-900'
+                      }`}
+                      title={img.is_primary || featuredImage === img.image_url ? 'Imagem principal' : 'Definir como principal'}
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </button>
+                    {/* Badge de principal */}
+                    {(img.is_primary || featuredImage === img.image_url) && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-amber-500 text-neutral-900 text-xs font-bold text-center py-0.5">
+                        Principal
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

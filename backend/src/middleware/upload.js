@@ -16,6 +16,7 @@ const UPLOAD_DIRS = {
   products: path.join(__dirname, '../../uploads/products'),
   banners: path.join(__dirname, '../../uploads/banners'),
   logo: path.join(__dirname, '../../uploads/logo'),
+  favicon: path.join(__dirname, '../../uploads/favicon'),
   temp: path.join(__dirname, '../../uploads/temp')
 };
 
@@ -262,21 +263,120 @@ const processBannerImage = async (req, res, next) => {
 
 /**
  * Middleware para processar logo
+ * Converte qualquer formato para PNG com transparência
  */
 const processLogoImage = async (req, res, next) => {
   if (!req.file) return next();
 
   try {
-    const processed = await processImage(
-      req.file.path,
-      UPLOAD_DIRS.logo,
-      { height: 200, quality: 90, format: 'png' }
-    );
+    console.log('🖼️ Processando logo:', req.file.path);
 
-    req.processedImage = processed;
+    const filename = `${uuidv4()}.png`;
+    const outputPath = path.join(UPLOAD_DIRS.logo, filename);
+
+    // Processar logo - manter proporção, altura máxima 200px, formato PNG
+    await sharp(req.file.path)
+      .resize(null, 200, { fit: 'inside', withoutEnlargement: true })
+      .png({ quality: 90 })
+      .toFile(outputPath);
+
+    // Obter metadados
+    const metadata = await sharp(outputPath).metadata();
+
+    // Remover arquivo temporário
+    try {
+      await fs.unlink(req.file.path);
+    } catch (e) {
+      console.log('🖼️ Aviso: não foi possível remover arquivo temp:', e.message);
+    }
+
+    req.processedImage = {
+      filename,
+      path: outputPath,
+      url: `/logo/${filename}`,
+      width: metadata.width,
+      height: metadata.height,
+      format: 'png'
+    };
+
+    console.log('🖼️ Logo processado:', req.processedImage);
     next();
   } catch (error) {
     console.error('Erro ao processar logo:', error);
+    next(error);
+  }
+};
+
+/**
+ * Middleware para processar favicon
+ * Converte qualquer formato para PNG 32x32 (padrão para navegadores modernos)
+ */
+const processFaviconImage = async (req, res, next) => {
+  if (!req.file) return next();
+
+  try {
+    console.log('⭐ Processando favicon:', req.file.path);
+
+    const filename = `${uuidv4()}.png`;
+    const outputPath = path.join(UPLOAD_DIRS.favicon, filename);
+
+    // Processar favicon - 32x32 PNG (padrão para navegadores)
+    await sharp(req.file.path)
+      .resize(32, 32, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toFile(outputPath);
+
+    // Também criar versões adicionais para melhor compatibilidade
+    const filename16 = `${uuidv4()}_16.png`;
+    const filename48 = `${uuidv4()}_48.png`;
+    const filename180 = `${uuidv4()}_apple.png`;
+
+    // 16x16 para favicons pequenos
+    await sharp(req.file.path)
+      .resize(16, 16, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toFile(path.join(UPLOAD_DIRS.favicon, filename16));
+
+    // 48x48 para alguns navegadores
+    await sharp(req.file.path)
+      .resize(48, 48, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toFile(path.join(UPLOAD_DIRS.favicon, filename48));
+
+    // 180x180 para Apple Touch Icon
+    await sharp(req.file.path)
+      .resize(180, 180, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toFile(path.join(UPLOAD_DIRS.favicon, filename180));
+
+    // Obter metadados
+    const metadata = await sharp(outputPath).metadata();
+
+    // Remover arquivo temporário
+    try {
+      await fs.unlink(req.file.path);
+    } catch (e) {
+      console.log('⭐ Aviso: não foi possível remover arquivo temp:', e.message);
+    }
+
+    req.processedImage = {
+      filename,
+      path: outputPath,
+      url: `/favicon/${filename}`,
+      width: metadata.width,
+      height: metadata.height,
+      format: 'png',
+      variants: {
+        favicon16: `/favicon/${filename16}`,
+        favicon48: `/favicon/${filename48}`,
+        appleTouch: `/favicon/${filename180}`
+      }
+    };
+
+    console.log('⭐ Favicon processado:', req.processedImage);
+    next();
+  } catch (error) {
+    console.error('Erro ao processar favicon:', error);
     next(error);
   }
 };
@@ -303,6 +403,7 @@ module.exports = {
   processProductImage,
   processBannerImage,
   processLogoImage,
+  processFaviconImage,
   deleteImage,
   UPLOAD_DIRS
 };

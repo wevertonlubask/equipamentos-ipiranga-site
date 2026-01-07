@@ -344,15 +344,38 @@ class Product {
    */
   static async addImages(productId, images) {
     const results = [];
-    
+
+    // Verificar se já existem imagens para este produto
+    const existingImages = await query(
+      'SELECT COUNT(*) as count FROM product_images WHERE product_id = ?',
+      [productId]
+    );
+    const hasExistingImages = existingImages[0].count > 0;
+
+    // Obter o maior display_order atual
+    const maxOrderResult = await query(
+      'SELECT COALESCE(MAX(display_order), -1) as max_order FROM product_images WHERE product_id = ?',
+      [productId]
+    );
+    let currentOrder = maxOrderResult[0].max_order + 1;
+
     for (let i = 0; i < images.length; i++) {
       const img = images[i];
+
+      // Se não há imagens existentes e é a primeira do lote, definir como principal
+      const shouldBePrimary = (!hasExistingImages && i === 0) || img.is_primary;
+
+      // Se esta imagem será principal, remover primary das outras
+      if (shouldBePrimary) {
+        await query('UPDATE product_images SET is_primary = FALSE WHERE product_id = ?', [productId]);
+      }
+
       const result = await query(
         `INSERT INTO product_images (product_id, image_url, alt_text, display_order, is_primary)
          VALUES (?, ?, ?, ?, ?)`,
-        [productId, img.image_url, img.alt_text || null, i, img.is_primary || false]
+        [productId, img.image_url, img.alt_text || null, currentOrder + i, shouldBePrimary]
       );
-      results.push({ id: result.insertId, ...img });
+      results.push({ id: result.insertId, ...img, is_primary: shouldBePrimary });
     }
 
     return results;

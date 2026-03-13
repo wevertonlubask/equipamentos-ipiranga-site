@@ -1,10 +1,6 @@
 {
   "/not-found": "app/not-found.js",
   "/page": "app/page.js",
-  "/admin/configuracoes/page": "app/admin/configuracoes/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/admin/categorias/page": "app/admin/categorias/page.js",
-  "/admin/produtos/page": "app/admin/produtos/page.js",
-  "/admin/banners/page": "app/admin/banners/page.js",
-  "/admin/cotacoes/page": "app/admin/cotacoes/page.js"
+  "/admin/login/page": "app/admin/login/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js"
 }
